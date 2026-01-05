@@ -39,7 +39,10 @@ describe 'Systemd::Unit::Service' do
   it { is_expected.to allow_value({ 'Environment' => ['FOO=BAR', 'BAR=FOO'] }) }
   it { is_expected.to allow_value({ 'EnvironmentFile' => '/etc/sysconfig/foo' }) }
   it { is_expected.to allow_value({ 'EnvironmentFile' => '-/etc/sysconfig/foo' }) }
+  it { is_expected.to allow_value({ 'EnvironmentFile' => '%h/.config/myapp/env' }) }
+  it { is_expected.to allow_value({ 'EnvironmentFile' => '-%h/.config/myapp/env' }) }
   it { is_expected.to allow_value({ 'EnvironmentFile' => ['/etc/sysconfig/foo', '-/etc/sysconfig/foo-bar'] }) }
+  it { is_expected.to allow_value({ 'EnvironmentFile' => ['%h/.config/myapp/env', '-%h/.config/myapp/env'] }) }
   it { is_expected.not_to allow_value({ 'EnvironmentFile' => '-/' }) }
   it { is_expected.not_to allow_value({ 'EnvironmentFile' => 'relative-path.sh' }) }
 
@@ -135,8 +138,40 @@ describe 'Systemd::Unit::Service' do
     context "with a key of #{depend} can have values of string or array of strings" do
       it { is_expected.to allow_value({ depend => '+/var/log' }) }
       it { is_expected.to allow_value({ depend => ['-/var/log', '+/opt/', '-+/home'] }) }
+      it { is_expected.to allow_value({ depend => '+%h/.local/share' }) }
+      it { is_expected.to allow_value({ depend => ['-%h/.local/share', '+%h/.cache', '-+%h/.config'] }) }
       it { is_expected.not_to allow_value({ depend => 'foo bar blub' }) }
       it { is_expected.not_to allow_value({ depend => '+-/opt' }) }
     end
   end
+
+  it { is_expected.to allow_value({ 'PIDFile' => '/run/myapp.pid' }) }
+  it { is_expected.to allow_value({ 'PIDFile' => '%t/myapp.pid' }) }
+  it { is_expected.not_to allow_value({ 'PIDFile' => 'run/myapp.pid' }) }
+
+  it { is_expected.to allow_value({ 'RootDirectory' => '/srv/chroot' }) }
+  it { is_expected.to allow_value({ 'RootDirectory' => '%h/.local/share/chroot' }) }
+  it { is_expected.not_to allow_value({ 'RootDirectory' => 'srv/chroot' }) }
+
+  it { is_expected.to allow_value({ 'RootImage' => '/var/lib/images/root.raw' }) }
+  it { is_expected.to allow_value({ 'RootImage' => '%h/.local/share/images/root.raw' }) }
+  it { is_expected.not_to allow_value({ 'RootImage' => 'var/lib/images/root.raw' }) }
+
+  it { is_expected.to allow_value({ 'BindPaths' => '/var/lib/myapp' }) }
+  it { is_expected.to allow_value({ 'BindPaths' => '-/var/lib/myapp' }) }
+  it { is_expected.to allow_value({ 'BindPaths' => '%h/.local/share/myapp' }) }
+  it { is_expected.to allow_value({ 'BindPaths' => '-%h/.local/share/myapp' }) }
+  it { is_expected.to allow_value({ 'BindPaths' => ['/var/lib/myapp', '-%h/.local/share/myapp'] }) }
+  it { is_expected.not_to allow_value({ 'BindPaths' => 'var/lib/myapp' }) }
+
+  it { is_expected.to allow_value({ 'BindReadOnlyPaths' => '/usr/share/myapp' }) }
+  it { is_expected.to allow_value({ 'BindReadOnlyPaths' => '-/usr/share/myapp' }) }
+  it { is_expected.to allow_value({ 'BindReadOnlyPaths' => '%h/.local/share/myapp' }) }
+  it { is_expected.to allow_value({ 'BindReadOnlyPaths' => '-%h/.local/share/myapp' }) }
+  it { is_expected.to allow_value({ 'BindReadOnlyPaths' => ['/usr/share/myapp', '-%h/.local/share/myapp'] }) }
+  it { is_expected.not_to allow_value({ 'BindReadOnlyPaths' => 'usr/share/myapp' }) }
+
+  it { is_expected.to allow_value({ 'NetworkNamespacePath' => '/run/netns/ns1' }) }
+  it { is_expected.to allow_value({ 'NetworkNamespacePath' => '%t/netns/ns1' }) }
+  it { is_expected.not_to allow_value({ 'NetworkNamespacePath' => 'run/netns/ns1' }) }
 end

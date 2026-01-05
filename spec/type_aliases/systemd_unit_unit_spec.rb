@@ -82,8 +82,11 @@ describe 'Systemd::Unit::Unit' do
     context "with a key of #{assert} can have files or negated files" do
       it { is_expected.to allow_value({ assert.to_s => '/my/existing/file' }) }
       it { is_expected.to allow_value({ assert.to_s => '!/my/existing/file' }) }
+      it { is_expected.to allow_value({ assert.to_s => '%h/.config/myapp/config.json' }) }
+      it { is_expected.to allow_value({ assert.to_s => '!%h/.config/myapp/config.json' }) }
+      it { is_expected.to allow_value({ assert.to_s => '|%h/.config/myapp/config.json' }) }
       it { is_expected.to allow_value({ assert.to_s => '' }) }
-      it { is_expected.to allow_value({ assert.to_s => ['', '/my/existing/file', '!/my/non/existing/file'] }) }
+      it { is_expected.to allow_value({ assert.to_s => ['', '/my/existing/file', '!/my/non/existing/file', '%h/.config/myapp/config.json'] }) }
     end
   end
 
@@ -103,6 +106,8 @@ describe 'Systemd::Unit::Unit' do
   it { is_expected.not_to allow_value({ 'Wants' => ['noextension'] }) }
   it { is_expected.not_to allow_value({ 'ConditionPathExists' => 'not/an/absolute/path' }) }
   it { is_expected.not_to allow_value({ 'ConditionPathExists' => ['not/an/absolute/path'] }) }
+  it { is_expected.not_to allow_value({ 'ConditionPathExists' => '!not/an/absolute/path' }) }
+  it { is_expected.not_to allow_value({ 'ConditionPathExists' => '|not/an/absolute/path' }) }
 
   it { is_expected.to allow_value({ 'CollectMode' => 'inactive' }) }
   it { is_expected.to allow_value({ 'CollectMode' => 'inactive-or-failed' }) }
@@ -111,6 +116,8 @@ describe 'Systemd::Unit::Unit' do
   it { is_expected.to allow_value({ 'RequiresMountsFor' => '/an/absolute/path' }) }
   it { is_expected.to allow_value({ 'RequiresMountsFor' => '' }) }
   it { is_expected.to allow_value({ 'RequiresMountsFor' => ['', '/an/absolute/path'] }) }
+  it { is_expected.to allow_value({ 'RequiresMountsFor' => '%h/.local/share' }) }
+  it { is_expected.to allow_value({ 'RequiresMountsFor' => ['', '%h/.local/share'] }) }
   it { is_expected.not_to allow_value({ 'RequiresMountsFor' => 'not/an/absolute/path' }) }
   it { is_expected.not_to allow_value({ 'RequiresMountsFor' => ['not/a/path'] }) }
   it { is_expected.not_to allow_value({ 'RequiresMountsFor' => [] }) }

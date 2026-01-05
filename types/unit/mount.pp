@@ -4,7 +4,7 @@
 type Systemd::Unit::Mount = Struct[
   {
     Optional['What']           => String[1],
-    Optional['Where']          => Stdlib::Unixpath,
+    Optional['Where']          => Systemd::Unit::PathValue,
     Optional['Type']           => String[1],
     Optional['Options']        => String[1],
     Optional['SloppyOptions']  => Boolean,
